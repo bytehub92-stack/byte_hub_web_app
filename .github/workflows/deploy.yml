@@ -1,31 +1,46 @@
-name: Deploy Flutter Web to Vercel
+name: Build & Deploy Flutter Web to Vercel
 
 on:
   push:
     branches:
-      - main   # Change if your main branch is "master"
+      - main   # change if your production branch is different
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Node (for vercel cli)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Flutter Web
+      - name: Run tests (optional)
+        # remove or comment out if you don't want tests on CI
+        run: flutter test || true
+
+      - name: Build Flutter web
         run: flutter build web --release
 
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Deploy to Vercel
-        run: vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }} --confirm --project ${{ secrets.VERCEL_PROJECT_ID }} --org ${{ secrets.VERCEL_ORG_ID }} build/web
+      - name: Deploy to Vercel (production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          # Use --prod for production. --confirm avoids interactive prompt.
+          vercel deploy --prod --token "$VERCEL_TOKEN" --confirm build/web
