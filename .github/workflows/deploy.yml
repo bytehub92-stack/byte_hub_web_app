@@ -3,7 +3,7 @@ name: Build & Deploy Flutter Web to Vercel
 on:
   push:
     branches:
-      - main   # change if your production branch is different
+      - main
   pull_request:
     branches:
       - main
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node (for vercel cli)
+      - name: Setup Node (for Vercel CLI)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -29,10 +29,15 @@ jobs:
         run: flutter pub get
 
       - name: Run tests (optional)
-        # remove or comment out if you don't want tests on CI
         run: flutter test || true
 
-      - name: Build Flutter web
+      - name: Create .env file
+        run: echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" > .env
+
+      - name: Create .env file
+        run: echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_URL }}" > .env
+
+      - name: Build Flutter Web
         run: flutter build web --release
 
       - name: Install Vercel CLI
@@ -40,7 +45,6 @@ jobs:
 
       - name: Deploy to Vercel (production)
         env:
-          VERCEL_TOKEN: ${secrets.VERCEL_TOKEN}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          # Use --prod for production. --confirm avoids interactive prompt.
           vercel deploy --prod --token "$VERCEL_TOKEN" --confirm build/web
