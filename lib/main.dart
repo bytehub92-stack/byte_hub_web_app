@@ -13,7 +13,7 @@ import 'core/di/injection_container.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load();
   Bloc.observer = const AppBlocObserver();
   await initializeDependencies();
   runApp(
@@ -40,11 +40,9 @@ class MyApp extends StatelessWidget {
             routerConfig: AppRouter.router(authService),
             title: 'Byte Hub Admin Panel',
             debugShowCheckedModeBanner: false,
-
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeService.materialThemeMode,

@@ -25,17 +25,19 @@ jobs:
         with:
           channel: stable
 
+      - name: Clean previous builds
+        run: flutter clean
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Run tests (optional)
-        run: flutter test || true
+        run: flutter test --exclude-tags=web,integration || true
 
       - name: Create .env file
-        run: echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" > .env
-
-      - name: Create .env file
-        run: echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_URL }}" > .env
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
 
       - name: Build Flutter Web
         run: flutter build web --release
@@ -47,4 +49,4 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          vercel deploy --prod --token "$VERCEL_TOKEN" --confirm build/web
+          vercel deploy --prod --token "$VERCEL_TOKEN" --yes build/web
