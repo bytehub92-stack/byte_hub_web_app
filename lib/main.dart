@@ -4,6 +4,7 @@ import 'package:admin_panel/core/services/theme_service.dart';
 import 'package:admin_panel/core/theme/app_theme.dart';
 import 'package:admin_panel/shared/services/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,15 +14,28 @@ import 'core/di/injection_container.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  await dotenv.load();
+
+  // Only load .env file if not on web or if file exists
+  // On web in production, we use --dart-define values
+  try {
+    await dotenv.load();
+  } catch (e) {
+    if (!kIsWeb) {
+      // Only throw error if we're not on web (local development needs .env)
+      debugPrint('Warning: Could not load .env file: $e');
+    }
+    // On web, this is expected - we use compile-time environment variables
+  }
+
   Bloc.observer = const AppBlocObserver();
   await initializeDependencies();
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
