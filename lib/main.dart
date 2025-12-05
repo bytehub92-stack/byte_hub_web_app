@@ -4,7 +4,7 @@ import 'package:admin_panel/core/services/theme_service.dart';
 import 'package:admin_panel/core/theme/app_theme.dart';
 import 'package:admin_panel/shared/services/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,16 +15,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  // Only load .env file if not on web or if file exists
-  // On web in production, we use --dart-define values
-  try {
-    await dotenv.load();
-  } catch (e) {
-    if (!kIsWeb) {
-      // Only throw error if we're not on web (local development needs .env)
-      debugPrint('Warning: Could not load .env file: $e');
+  // Only load .env file for local development (not web)
+  // For web, we ALWAYS use --dart-define flags
+  if (!kIsWeb) {
+    // Native platforms always load .env
+    try {
+      await dotenv.load(fileName: '.env');
+      debugPrint('✅ Loaded .env file successfully');
+    } catch (e) {
+      debugPrint('⚠️ Could not load .env file: $e');
+      debugPrint(
+          '💡 Tip: Create a .env file in the project root with SUPABASE_URL and SUPABASE_ANON_KEY');
     }
-    // On web, this is expected - we use compile-time environment variables
+  } else {
+    // Web platform - NEVER load .env file, always use --dart-define
+    debugPrint(
+        '🌐 Web mode - environment variables must be provided via --dart-define flags');
+    debugPrint(
+        '💡 Run with: flutter run -d chrome --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...');
   }
 
   Bloc.observer = const AppBlocObserver();

@@ -34,16 +34,21 @@ jobs:
       - name: Run tests (optional)
         run: flutter test --exclude-tags=web,integration || true
 
-      - name: Create .env file for local dev compatibility
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-
       - name: Build Flutter Web with Environment Variables
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           flutter build web --release \
-            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
-            --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+            --dart-define=SUPABASE_URL="${SUPABASE_URL}" \
+            --dart-define=SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY}"
+
+      - name: Verify build output
+        run: |
+          echo "✅ Build completed. Checking output..."
+          ls -la build/web/
+          echo "📦 Checking main.dart.js size:"
+          ls -lh build/web/main.dart.js
 
       - name: Install Vercel CLI
         run: npm install -g vercel
