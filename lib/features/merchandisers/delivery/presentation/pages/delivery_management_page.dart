@@ -1,6 +1,7 @@
 // lib/features/delivery/presentation/pages/delivery_management_page.dart
 
 import 'package:admin_panel/core/widgets/platform_refresh_wrapper.dart';
+import 'package:admin_panel/features/merchandisers/delivery/presentation/pages/driver_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -55,11 +56,11 @@ class _DeliveryManagementPageState extends State<DeliveryManagementPage>
       if (_merchandiserId != null && mounted) {
         context.read<DeliveryBloc>().add(LoadDrivers(_merchandiserId!));
         context.read<DeliveryBloc>().add(
-          LoadOrderAssignments(
-            merchandiserId: _merchandiserId!,
-            onlyActive: true,
-          ),
-        );
+              LoadOrderAssignments(
+                merchandiserId: _merchandiserId!,
+                onlyActive: true,
+              ),
+            );
       }
     } catch (e) {
       if (mounted) {
@@ -273,141 +274,156 @@ class _DriversTabState extends State<_DriversTab>
   }
 
   Widget _buildDriverCard(Driver driver) {
-    // ... existing implementation
+    final deliveryBloc = context.read<DeliveryBloc>();
+
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    driver.fullName[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider.value(
+                value: deliveryBloc,
+                child: DriverDetailsPage(driver: driver),
+              ),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(AppConstants.defaultRadius),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: AppColors.primary,
+                    child: Text(
+                      driver.fullName[0].toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        driver.fullName,
-                        style: AppTextStyles.getH4(context),
-                      ),
-                      if (driver.phoneNumber != null) ...[
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.phone,
-                              size: 14,
-                              color: AppColors.grey600,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              driver.phoneNumber!,
-                              style: AppTextStyles.getBodySmall(context),
-                            ),
-                          ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          driver.fullName,
+                          style: AppTextStyles.getH4(context),
                         ),
-                      ],
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: driver.isAvailable
-                            ? AppColors.success.withValues(alpha: 0.1)
-                            : AppColors.warning.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            driver.isAvailable
-                                ? Icons.check_circle
-                                : Icons.local_shipping,
-                            size: 12,
-                            color: driver.isAvailable
-                                ? AppColors.success
-                                : AppColors.warning,
+                        if (driver.phoneNumber != null) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.phone,
+                                size: 14,
+                                color: AppColors.grey600,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                driver.phoneNumber!,
+                                style: AppTextStyles.getBodySmall(context),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            driver.isAvailable ? 'Available' : 'On Delivery',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                        ],
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: driver.isAvailable
+                              ? AppColors.success.withValues(alpha: 0.1)
+                              : AppColors.warning.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              driver.isAvailable
+                                  ? Icons.check_circle
+                                  : Icons.local_shipping,
+                              size: 12,
                               color: driver.isAvailable
                                   ? AppColors.success
                                   : AppColors.warning,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!driver.isActive) ...[
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Inactive',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: AppColors.error,
-                            fontWeight: FontWeight.w600,
-                          ),
+                            const SizedBox(width: 4),
+                            Text(
+                              driver.isAvailable ? 'Available' : 'On Delivery',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: driver.isAvailable
+                                    ? AppColors.success
+                                    : AppColors.warning,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                      if (!driver.isActive) ...[
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Text(
+                            'Inactive',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.error,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
-                ),
-              ],
-            ),
-            if (driver.vehicleType != null) ...[
-              const SizedBox(height: 12),
-              const Divider(),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.motorcycle,
-                    size: 20,
-                    color: AppColors.grey600,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    driver.vehicleInfo,
-                    style: AppTextStyles.getBodyMedium(context),
                   ),
                 ],
               ),
+              if (driver.vehicleType != null) ...[
+                const SizedBox(height: 12),
+                const Divider(),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.motorcycle,
+                      size: 20,
+                      color: AppColors.grey600,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      driver.vehicleInfo,
+                      style: AppTextStyles.getBodyMedium(context),
+                    ),
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -443,11 +459,11 @@ class _ActiveDeliveriesTabState extends State<_ActiveDeliveriesTab>
 
   void _loadAssignments() {
     context.read<DeliveryBloc>().add(
-      LoadOrderAssignments(
-        merchandiserId: widget.merchandiserId,
-        onlyActive: true,
-      ),
-    );
+          LoadOrderAssignments(
+            merchandiserId: widget.merchandiserId,
+            onlyActive: true,
+          ),
+        );
   }
 
   @override
