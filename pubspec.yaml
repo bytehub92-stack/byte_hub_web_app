@@ -60,6 +60,5 @@ dependency_overrides:
 flutter:
   uses-material-design: true
   assets:
-    - .env
     - assets/images/logo/
     - assets/translations/
