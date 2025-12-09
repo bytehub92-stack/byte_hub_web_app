@@ -15,6 +15,7 @@ import 'package:admin_panel/features/shared/shared_feature/domain/entities/sub_c
 import 'package:admin_panel/shared/widgets/empty_state_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:math' as math;
 
 class SubCategoriesProductsPage extends StatefulWidget {
   final String categoryId;
@@ -40,6 +41,10 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
   String _productSearchQuery = '';
   String _productSortBy = 'newest';
   int _currentPage = 1;
+  final int _itemsPerPage = 24;
+
+  // Debouncing for search
+  DateTime _lastSearchTime = DateTime.now();
 
   @override
   void initState() {
@@ -61,20 +66,46 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
   void _loadProducts() {
     if (_selectedSubCategory != null) {
       context.read<ProductBloc>().add(
-        LoadProducts(
-          subCategoryId: _selectedSubCategory!.id,
-          page: _currentPage,
-          searchQuery: _productSearchQuery.isEmpty ? null : _productSearchQuery,
-          sortBy: _productSortBy,
-        ),
-      );
+            LoadProducts(
+              subCategoryId: _selectedSubCategory!.id,
+              page: _currentPage,
+              limit: _itemsPerPage,
+              searchQuery:
+                  _productSearchQuery.isEmpty ? null : _productSearchQuery,
+              sortBy: _productSortBy,
+            ),
+          );
     }
+  }
+
+  void _goToPage(int page) {
+    setState(() {
+      _currentPage = page;
+    });
+    _loadProducts();
+  }
+
+  // Debounced search to avoid too many API calls
+  void _onSearchChanged(String value) {
+    final now = DateTime.now();
+    _lastSearchTime = now;
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (_lastSearchTime == now) {
+        setState(() {
+          _productSearchQuery = value;
+          _currentPage = 1; // Reset to first page on search
+        });
+        _loadProducts();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 30,
         title: Text(widget.categoryName),
         backgroundColor: Colors.pink,
         bottom: TabBar(
@@ -88,7 +119,6 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
       ),
       body: TabBarView(
         controller: _tabController,
-
         children: [_buildSubCategoriesTab(), _buildProductsTab()],
       ),
     );
@@ -213,6 +243,7 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.message)));
+          _loadProducts();
         } else if (state is ProductError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -228,6 +259,8 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
             _buildProductsHeader(),
             _buildProductsSearchAndFilter(),
             Expanded(child: _buildProductsList(state)),
+            if (state is ProductsLoaded && state.products.isNotEmpty)
+              _buildPaginationControls(state.products.length),
           ],
         );
       },
@@ -258,7 +291,7 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
                 style: AppTextStyles.h4Light,
               ),
               Text(
-                '${_selectedSubCategory!.productCount} Products',
+                '${_selectedSubCategory!.productCount} Total Products',
                 style: AppTextStyles.bodyMediumLight.copyWith(
                   color: AppColors.grey500,
                 ),
@@ -286,13 +319,7 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
                 hintText: 'Search products...',
                 prefixIcon: Icon(Icons.search),
               ),
-              onChanged: (value) {
-                setState(() {
-                  _productSearchQuery = value;
-                  _currentPage = 1;
-                });
-                _loadProducts();
-              },
+              onChanged: _onSearchChanged,
             ),
           ),
           const SizedBox(width: 16),
@@ -353,16 +380,19 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
         return EmptyStateWidget(
           icon: Icons.inventory_2_outlined,
           title: 'No Products',
-          message: 'Add your first product to this sub-category',
-          actionLabel: 'Add Product',
-          onAction: () => _showProductDialog(),
+          message: _productSearchQuery.isEmpty
+              ? 'Add your first product to this sub-category'
+              : 'No products found matching your search',
+          actionLabel: _productSearchQuery.isEmpty ? 'Add Product' : null,
+          onAction:
+              _productSearchQuery.isEmpty ? () => _showProductDialog() : null,
         );
       }
 
       return GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5,
+          crossAxisCount: 6,
           childAspectRatio: 0.65,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
@@ -371,6 +401,7 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
         itemBuilder: (context, index) {
           final product = state.products[index];
           return ProductCard(
+            key: ValueKey(product.id),
             product: product,
             onEdit: () => _showProductDialog(product),
             onDelete: () => _showDeleteProductDialog(product),
@@ -380,6 +411,125 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
     }
 
     return const SizedBox.shrink();
+  }
+
+  Widget _buildPaginationControls(int currentPageItemCount) {
+    final totalProducts = _selectedSubCategory?.productCount ?? 0;
+    final totalPages = (totalProducts / _itemsPerPage).ceil();
+
+    if (totalPages <= 1) return const SizedBox.shrink();
+
+    // Calculate page range to show
+    int startPage = math.max(1, _currentPage - 2);
+    int endPage = math.min(totalPages, _currentPage + 2);
+
+    // Adjust if we're at the beginning or end
+    if (_currentPage <= 3) {
+      endPage = math.min(5, totalPages);
+    }
+    if (_currentPage >= totalPages - 2) {
+      startPage = math.max(1, totalPages - 4);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        border: Border(
+          top: BorderSide(color: AppColors.borderLight),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Previous button
+          IconButton(
+            onPressed:
+                _currentPage > 1 ? () => _goToPage(_currentPage - 1) : null,
+            icon: const Icon(Icons.chevron_left),
+            tooltip: 'Previous',
+          ),
+          const SizedBox(width: 8),
+
+          // First page
+          if (startPage > 1) ...[
+            _buildPageButton(1),
+            if (startPage > 2)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text('...', style: AppTextStyles.bodyMediumLight),
+              ),
+          ],
+
+          // Page numbers
+          ...List.generate(
+            endPage - startPage + 1,
+            (index) => _buildPageButton(startPage + index),
+          ),
+
+          // Last page
+          if (endPage < totalPages) ...[
+            if (endPage < totalPages - 1)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text('...', style: AppTextStyles.bodyMediumLight),
+              ),
+            _buildPageButton(totalPages),
+          ],
+
+          const SizedBox(width: 8),
+          // Next button
+          IconButton(
+            onPressed: _currentPage < totalPages
+                ? () => _goToPage(_currentPage + 1)
+                : null,
+            icon: const Icon(Icons.chevron_right),
+            tooltip: 'Next',
+          ),
+
+          const SizedBox(width: 16),
+          // Page info
+          Text(
+            'Page $_currentPage of $totalPages',
+            style: AppTextStyles.bodyMediumLight,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPageButton(int page) {
+    final isCurrentPage = page == _currentPage;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Material(
+        color: isCurrentPage ? AppColors.primary : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: isCurrentPage ? null : () => _goToPage(page),
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color:
+                    isCurrentPage ? AppColors.primary : AppColors.borderLight,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '$page',
+              style: AppTextStyles.bodyMediumLight.copyWith(
+                color: isCurrentPage ? AppColors.white : AppColors.textDark,
+                fontWeight: isCurrentPage ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _showSubCategoryDialog([SubCategory? subCategory]) {
@@ -427,11 +577,11 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
           ElevatedButton(
             onPressed: () {
               context.read<SubCategoryBloc>().add(
-                DeleteSubCategory(
-                  subCategoryId: subCategory.id,
-                  categoryId: widget.categoryId,
-                ),
-              );
+                    DeleteSubCategory(
+                      subCategoryId: subCategory.id,
+                      categoryId: widget.categoryId,
+                    ),
+                  );
               Navigator.of(dialogContext).pop();
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
@@ -458,8 +608,8 @@ class _SubCategoriesProductsPageState extends State<SubCategoriesProductsPage>
           ElevatedButton(
             onPressed: () {
               context.read<ProductBloc>().add(
-                DeleteProduct(product.id, product.subCategoryId),
-              );
+                    DeleteProduct(product.id, product.subCategoryId),
+                  );
               Navigator.of(dialogContext).pop();
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),

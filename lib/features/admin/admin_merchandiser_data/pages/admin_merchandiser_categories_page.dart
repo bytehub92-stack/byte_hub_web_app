@@ -1,7 +1,7 @@
 import 'package:admin_panel/core/di/injection_container.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_event.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_bloc.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_states.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_event.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_bloc.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_states.dart';
 import 'package:admin_panel/features/admin/admin_merchandiser_data/pages/admin_merchandiser_subcategory_products_page.dart';
 import 'package:admin_panel/features/shared/shared_feature/data/models/category_model.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +47,7 @@ class _AdminMerchandiserCategoriesPageState
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<MerchandiserDataBloc>()
+      create: (context) => sl<AdminDataBloc>()
         ..add(AdminLoadCategories(merchandiserId: widget.merchandiserId)),
       child: Scaffold(
         body: Padding(
@@ -56,7 +56,7 @@ class _AdminMerchandiserCategoriesPageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header with search
-              BlocBuilder<MerchandiserDataBloc, MerchandiserDataState>(
+              BlocBuilder<AdminDataBloc, AdminDataState>(
                 builder: (context, state) {
                   final categoryCount =
                       state is CategoriesLoaded ? state.categories.length : 0;
@@ -71,9 +71,8 @@ class _AdminMerchandiserCategoriesPageState
                       ),
                       IconButton(
                         onPressed: () {
-                          context.read<MerchandiserDataBloc>().add(
-                              AdminLoadCategories(
-                                  merchandiserId: widget.merchandiserId));
+                          context.read<AdminDataBloc>().add(AdminLoadCategories(
+                              merchandiserId: widget.merchandiserId));
                         },
                         icon: const Icon(Icons.refresh),
                         tooltip: 'Refresh',
@@ -100,7 +99,7 @@ class _AdminMerchandiserCategoriesPageState
 
               // Content
               Expanded(
-                child: BlocBuilder<MerchandiserDataBloc, MerchandiserDataState>(
+                child: BlocBuilder<AdminDataBloc, AdminDataState>(
                   builder: (context, state) {
                     if (state is CategoriesLoading) {
                       return const Center(child: CircularProgressIndicator());
@@ -147,7 +146,7 @@ class _AdminMerchandiserCategoriesPageState
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              context.read<MerchandiserDataBloc>().add(
+              context.read<AdminDataBloc>().add(
                   AdminLoadCategories(merchandiserId: widget.merchandiserId));
             },
             child: const Text('Retry'),
@@ -212,7 +211,7 @@ class _AdminMerchandiserCategoriesPageState
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider(
-          create: (context) => sl<MerchandiserDataBloc>()
+          create: (context) => sl<AdminDataBloc>()
             ..add(AdminLoadSubCategories(categoryId: category.id)),
           child: AdminMerchandiserSubcategoryProductsPage(
             merchandiserId: merchandiserId,

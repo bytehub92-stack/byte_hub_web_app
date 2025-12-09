@@ -19,7 +19,7 @@ class LoadProducts extends ProductEvent {
   const LoadProducts({
     required this.subCategoryId,
     this.page = 1,
-    this.limit = 20,
+    this.limit = 18,
     this.searchQuery,
     this.sortBy,
   });
@@ -71,25 +71,25 @@ class CreateProduct extends ProductEvent {
 
   @override
   List<Object?> get props => [
-    merchandiserId,
-    categoryId,
-    subCategoryId,
-    name,
-    description,
-    price,
-    images,
-    stockQuantity,
-    unitOfMeasurementId, // NEW
-    sku,
-    isAvailable,
-    isFeatured,
-    discountPrice,
-    discountStartDate,
-    discountEndDate,
-    costPrice,
-    weight,
-    tags,
-  ];
+        merchandiserId,
+        categoryId,
+        subCategoryId,
+        name,
+        description,
+        price,
+        images,
+        stockQuantity,
+        unitOfMeasurementId, // NEW
+        sku,
+        isAvailable,
+        isFeatured,
+        discountPrice,
+        discountStartDate,
+        discountEndDate,
+        costPrice,
+        weight,
+        tags,
+      ];
 }
 
 class UpdateProduct extends ProductEvent {
@@ -133,24 +133,24 @@ class UpdateProduct extends ProductEvent {
 
   @override
   List<Object?> get props => [
-    productId,
-    subCategoryId,
-    name,
-    description,
-    price,
-    images,
-    stockQuantity,
-    unitOfMeasurementId, // NEW
-    sku,
-    isAvailable,
-    isFeatured,
-    discountPrice,
-    discountStartDate,
-    discountEndDate,
-    costPrice,
-    weight,
-    tags,
-  ];
+        productId,
+        subCategoryId,
+        name,
+        description,
+        price,
+        images,
+        stockQuantity,
+        unitOfMeasurementId, // NEW
+        sku,
+        isAvailable,
+        isFeatured,
+        discountPrice,
+        discountStartDate,
+        discountEndDate,
+        costPrice,
+        weight,
+        tags,
+      ];
 }
 
 class DeleteProduct extends ProductEvent {

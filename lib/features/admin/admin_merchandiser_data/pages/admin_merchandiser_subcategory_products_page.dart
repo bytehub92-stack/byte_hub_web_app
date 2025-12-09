@@ -4,9 +4,9 @@ import 'package:admin_panel/core/theme/text_styles.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/entities/category.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/entities/product.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/entities/sub_category.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_bloc.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_event.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_states.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_bloc.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_event.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_states.dart';
 import 'package:admin_panel/features/admin/admin_merchandiser_data/widgets/products_grid_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +39,7 @@ class _AdminMerchandiserSubcategoryProductsPageState
   void initState() {
     super.initState();
     // Load sub-categories on init
-    context.read<MerchandiserDataBloc>().add(
+    context.read<AdminDataBloc>().add(
           AdminLoadSubCategories(categoryId: widget.category.id),
         );
   }
@@ -60,7 +60,7 @@ class _AdminMerchandiserSubcategoryProductsPageState
       // Load products for first tab
       if (subCategories.isNotEmpty) {
         Future.microtask(() {
-          context.read<MerchandiserDataBloc>().add(
+          context.read<AdminDataBloc>().add(
                 AdminLoadProducts(subCategoryId: subCategories.first.id),
               );
         });
@@ -71,7 +71,7 @@ class _AdminMerchandiserSubcategoryProductsPageState
   void _onTabChanged() {
     if (_tabController?.indexIsChanging == true && _subCategories.isNotEmpty) {
       final selectedSubCategory = _subCategories[_tabController!.index];
-      context.read<MerchandiserDataBloc>().add(
+      context.read<AdminDataBloc>().add(
             AdminLoadProducts(subCategoryId: selectedSubCategory.id),
           );
     }
@@ -83,7 +83,7 @@ class _AdminMerchandiserSubcategoryProductsPageState
       widget.category.name,
     );
 
-    return BlocConsumer<MerchandiserDataBloc, MerchandiserDataState>(
+    return BlocConsumer<AdminDataBloc, AdminDataState>(
       listener: (context, state) {
         if (state is SubCategoriesLoaded) {
           _initializeTabController(state.subCategories);
@@ -184,7 +184,7 @@ class _AdminMerchandiserSubcategoryProductsPageState
   }
 
   Widget _buildProductsTab(
-    MerchandiserDataState state,
+    AdminDataState state,
     SubCategory subCategory,
   ) {
     if (state is ProductsLoading) {
@@ -255,7 +255,7 @@ class _AdminMerchandiserSubcategoryProductsPageState
       isLoading: isLoadingMore,
       hasMore: state.hasMore,
       onLoadMore: () {
-        context.read<MerchandiserDataBloc>().add(AdminLoadMoreProducts());
+        context.read<AdminDataBloc>().add(AdminLoadMoreProducts());
       },
       onProductTap: (product) {
         _showProductDetails(product);

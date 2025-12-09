@@ -9,7 +9,7 @@ import 'package:admin_panel/features/shared/shared_feature/presentation/bloc/cus
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../store_management/data/datasources/fake_customer_remote_datasource.dart';
+import '../store_management/data/fake_datasources/fake_customer_remote_datasource.dart';
 
 void main() {
   late CustomerBloc bloc;

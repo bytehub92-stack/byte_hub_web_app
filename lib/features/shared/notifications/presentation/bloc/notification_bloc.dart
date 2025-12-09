@@ -1,6 +1,7 @@
 // lib/features/notifications/presentation/bloc/notification_bloc.dart
 import 'dart:async';
 import 'package:admin_panel/features/shared/notifications/data/models/notification_model.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/datasources/notification_remote_datasource.dart';
 import 'notification_event.dart';
@@ -33,6 +34,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       final unreadCount = await _dataSource.getUnreadCount(
         userId: event.userId,
       );
+      print('notification bloc, unread count: $unreadCount');
       emit(
         NotificationLoaded(
           notifications: notifications,
@@ -73,10 +75,11 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     if (state is NotificationLoaded) {
+      final currentState = state as NotificationLoaded;
+
       try {
         await _dataSource.markAsRead(notificationId: event.notificationId);
 
-        final currentState = state as NotificationLoaded;
         final updatedNotifications = currentState.notifications.map((notif) {
           if (notif.id == event.notificationId) {
             return NotificationModel(
@@ -93,18 +96,24 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           return notif;
         }).toList();
 
-        final newUnreadCount = updatedNotifications
-            .where((notif) => !notif.isRead)
-            .length;
+        final newUnreadCount =
+            updatedNotifications.where((notif) => !notif.isRead).length;
 
+        print('notification bloc, new unread count: $newUnreadCount');
+
+        // ✅ Force state update with new timestamp
         emit(
           NotificationLoaded(
             notifications: updatedNotifications,
             unreadCount: newUnreadCount,
+            showOverlay: false,
+            latestNotification: null,
           ),
         );
+
+        debugPrint('✅ Marked as read. New unread count: $newUnreadCount');
       } catch (e) {
-        // Silent fail
+        debugPrint('❌ Error marking as read: $e');
       }
     }
   }
@@ -114,10 +123,11 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     if (state is NotificationLoaded) {
+      final currentState = state as NotificationLoaded;
+
       try {
         await _dataSource.markAllAsRead(userId: event.userId);
 
-        final currentState = state as NotificationLoaded;
         final updatedNotifications = currentState.notifications.map((notif) {
           return NotificationModel(
             id: notif.id,
@@ -131,12 +141,17 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           );
         }).toList();
 
+        // ✅ Force state update
         emit(
           NotificationLoaded(
             notifications: updatedNotifications,
             unreadCount: 0,
+            showOverlay: false,
+            latestNotification: null,
           ),
         );
+
+        debugPrint('✅ Marked all as read. Unread count: 0');
       } catch (e) {
         emit(NotificationError(e.toString()));
       }
@@ -148,26 +163,34 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     if (state is NotificationLoaded) {
+      final currentState = state as NotificationLoaded;
+      print('notifications bloc, now will access remote to delete');
       try {
         await _dataSource.deleteNotification(
           notificationId: event.notificationId,
         );
-
-        final currentState = state as NotificationLoaded;
+        print('notifications bloc, now accessed remote to delete');
         final updatedNotifications = currentState.notifications
             .where((notif) => notif.id != event.notificationId)
             .toList();
 
-        final newUnreadCount = updatedNotifications
-            .where((notif) => !notif.isRead)
-            .length;
+        print(
+            'notifications bloc, updated notifications: $updatedNotifications');
 
+        final newUnreadCount =
+            updatedNotifications.where((notif) => !notif.isRead).length;
+
+        // ✅ Force state update
         emit(
           NotificationLoaded(
             notifications: updatedNotifications,
             unreadCount: newUnreadCount,
+            showOverlay: false,
+            latestNotification: null,
           ),
         );
+
+        debugPrint('✅ Deleted notification. New unread count: $newUnreadCount');
       } catch (e) {
         emit(NotificationError(e.toString()));
       }
@@ -184,22 +207,21 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     await _subscription?.cancel();
 
     // Subscribe to notification stream
-    _subscription = _dataSource
-        .subscribeToNotifications(userId: event.userId)
-        .listen(
-          (notification) {
-            print(
-              '📩 New notification received via stream: ${notification.id}',
-            );
-            add(NotificationReceived(notification: notification));
-          },
-          onError: (error) {
-            print('❌ Error in notification stream: $error');
-          },
-          onDone: () {
-            print('✅ Notification stream closed');
-          },
+    _subscription =
+        _dataSource.subscribeToNotifications(userId: event.userId).listen(
+      (notification) {
+        print(
+          '📩 New notification received via stream: ${notification.id}',
         );
+        add(NotificationReceived(notification: notification));
+      },
+      onError: (error) {
+        print('❌ Error in notification stream: $error');
+      },
+      onDone: () {
+        print('✅ Notification stream closed');
+      },
+    );
 
     print('✅ Successfully subscribed to notifications');
   }
@@ -208,7 +230,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     NotificationReceived event,
     Emitter<NotificationState> emit,
   ) {
-    print('🔔 Notification received: ${event.notification.title}');
+    print('📢 Notification received: ${event.notification.title}');
 
     if (state is NotificationLoaded) {
       final currentState = state as NotificationLoaded;
@@ -222,10 +244,14 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         print(
           '✅ Adding new notification, current unread: ${currentState.unreadCount}',
         );
+
+        // ✅ Emit new state with updated notification list and count
         emit(
           NotificationLoaded(
             notifications: [event.notification, ...currentState.notifications],
             unreadCount: currentState.unreadCount + 1,
+            showOverlay: true, // Add this flag
+            latestNotification: event.notification, // Add this
           ),
         );
       } else {
@@ -233,9 +259,13 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       }
     } else {
       print('⚠️ State is not NotificationLoaded, current state: $state');
-      // If not loaded yet, initialize with this notification
       emit(
-        NotificationLoaded(notifications: [event.notification], unreadCount: 1),
+        NotificationLoaded(
+          notifications: [event.notification],
+          unreadCount: 1,
+          showOverlay: true,
+          latestNotification: event.notification,
+        ),
       );
     }
   }

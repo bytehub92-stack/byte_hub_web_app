@@ -3,16 +3,16 @@ import 'package:admin_panel/features/shared/shared_feature/domain/entities/sub_c
 import 'package:equatable/equatable.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/entities/category.dart';
 
-abstract class MerchandiserDataState extends Equatable {
+abstract class AdminDataState extends Equatable {
   @override
   List<Object?> get props => [];
 }
 
-class MerchandiserDataStateInitial extends MerchandiserDataState {}
+class MerchandiserDataStateInitial extends AdminDataState {}
 
-class CategoriesLoading extends MerchandiserDataState {}
+class CategoriesLoading extends AdminDataState {}
 
-class CategoriesLoaded extends MerchandiserDataState {
+class CategoriesLoaded extends AdminDataState {
   final List<Category> categories;
 
   CategoriesLoaded({
@@ -23,9 +23,9 @@ class CategoriesLoaded extends MerchandiserDataState {
   List<Object> get props => [categories];
 }
 
-class SubCategoriesLoading extends MerchandiserDataState {}
+class SubCategoriesLoading extends AdminDataState {}
 
-class SubCategoriesLoaded extends MerchandiserDataState {
+class SubCategoriesLoaded extends AdminDataState {
   final List<SubCategory> subCategories;
   final String selectedSubCategoryId;
 
@@ -38,9 +38,9 @@ class SubCategoriesLoaded extends MerchandiserDataState {
   List<Object> get props => [subCategories, selectedSubCategoryId];
 }
 
-class ProductsLoading extends MerchandiserDataState {}
+class ProductsLoading extends AdminDataState {}
 
-class ProductsLoaded extends MerchandiserDataState {
+class ProductsLoaded extends AdminDataState {
   final List<SubCategory> subCategories;
   final String selectedSubCategoryId;
   final List<Product> products;
@@ -71,7 +71,7 @@ class ProductsLoaded extends MerchandiserDataState {
       ];
 }
 
-class ProductsLoadingMore extends MerchandiserDataState {
+class ProductsLoadingMore extends AdminDataState {
   final List<SubCategory> subCategories;
   final String selectedSubCategoryId;
   final List<Product> products;
@@ -96,7 +96,7 @@ class ProductsLoadingMore extends MerchandiserDataState {
       ];
 }
 
-class MerchandiserDataStateError extends MerchandiserDataState {
+class MerchandiserDataStateError extends AdminDataState {
   final String message;
 
   MerchandiserDataStateError({required this.message});

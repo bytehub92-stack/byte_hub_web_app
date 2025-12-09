@@ -7,7 +7,7 @@ import 'package:admin_panel/features/shared/shared_feature/domain/entities/produ
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../datasources/fake_product_remote_datasource.dart';
+import '../fake_datasources/fake_product_remote_datasource.dart';
 
 void main() {
   late ProductRepositoryImpl repository;
@@ -182,8 +182,8 @@ void main() {
             expect(
               products[i].createdAt.isAfter(products[i + 1].createdAt) ||
                   products[i].createdAt.isAtSameMomentAs(
-                    products[i + 1].createdAt,
-                  ),
+                        products[i + 1].createdAt,
+                      ),
               true,
             );
           }

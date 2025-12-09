@@ -7,6 +7,7 @@ class RouteConstants {
   static const String merchandiserProfile = '/merchandiser-profile';
   static const String chats = '/chats';
   static const String chatRoom = '/chat-room';
+  static const String notifications = '/notifications';
 
   static const String loginName = 'login';
   static const String adminDashboardName = 'admin-dashboard';
@@ -15,4 +16,5 @@ class RouteConstants {
   static const String merchandiserProfileName = 'merchandiser-profile';
   static const String chatsName = 'chats';
   static const String chatRoomName = 'chat-room';
+  static const String notificationsName = 'notifications';
 }

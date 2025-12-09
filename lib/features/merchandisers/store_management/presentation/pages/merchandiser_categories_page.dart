@@ -62,8 +62,8 @@ class MerchandiserCategoriesPage extends StatelessWidget {
               // Load categories when page is first loaded
               if (state is CategoryInitial) {
                 context.read<CategoryBloc>().add(
-                  LoadCategories(merchandiserId),
-                );
+                      LoadCategories(merchandiserId),
+                    );
                 return const Center(child: CircularProgressIndicator());
               }
               return Scaffold(
@@ -135,7 +135,7 @@ class MerchandiserCategoriesPage extends StatelessWidget {
       }
       return GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
+          crossAxisCount: 5,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           childAspectRatio: 0.8,
