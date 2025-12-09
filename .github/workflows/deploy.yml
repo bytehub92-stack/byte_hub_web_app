@@ -32,8 +32,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run tests (optional)
-        run: flutter test --exclude-tags=web,integration || true
+      # - name: Run tests (optional)
+      #   run: flutter test --exclude-tags=web,integration || true
 
       - name: Build Flutter Web with Environment Variables
         env:
@@ -55,6 +55,7 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel (production)
+        if: github.ref == 'refs/heads/main'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
