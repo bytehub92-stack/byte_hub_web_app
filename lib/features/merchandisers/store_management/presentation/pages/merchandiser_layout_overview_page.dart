@@ -14,6 +14,8 @@ import 'package:admin_panel/features/merchandisers/store_management/presentation
 import 'package:admin_panel/features/merchandisers/store_management/presentation/widgets/merchandiser_custom_app_bar.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_event.dart';
+import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_state.dart';
+import 'package:admin_panel/features/shared/notifications/presentation/widgets/notification_overlay.dart';
 import 'package:admin_panel/features/shared/orders/presentation/pages/orders_page.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/entities/merchandiser_stats.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/repositories/merchandiser_stats_repository.dart';
@@ -34,6 +36,8 @@ class MerchandiserLayoutPage extends StatefulWidget {
 class _MerchandiserLayoutPageState extends State<MerchandiserLayoutPage> {
   int _selectedIndex = 0;
   String? _merchandiserId;
+  String? _profileId;
+  bool _hasInitializedNotifications = false;
 
   final List<NavigationDestination> _destinations = [
     const NavigationDestination(
@@ -76,11 +80,6 @@ class _MerchandiserLayoutPageState extends State<MerchandiserLayoutPage> {
   @override
   void initState() {
     super.initState();
-    if (_merchandiserId != null) {
-      context.read<NotificationBloc>()
-        ..add(LoadNotifications(userId: _merchandiserId!))
-        ..add(SubscribeToNotifications(userId: _merchandiserId!));
-    }
     _loadMerchandiserData();
   }
 
@@ -91,16 +90,60 @@ class _MerchandiserLayoutPageState extends State<MerchandiserLayoutPage> {
 
       final merchandiserResponse = await Supabase.instance.client
           .from('merchandisers')
-          .select('id')
+          .select('id, profile_id')
           .eq('profile_id', user.id)
           .single();
 
       setState(() {
         _merchandiserId = merchandiserResponse['id'] as String;
+        _profileId = merchandiserResponse['profile_id'] as String;
       });
+
+      // ✅ Trigger a rebuild so didChangeDependencies can initialize notifications
     } catch (e) {
       debugPrint('Error loading merchandiser data: $e');
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // ✅ Initialize notifications after the widget tree is built and BLoC is available
+    if (_profileId != null && !_hasInitializedNotifications) {
+      _hasInitializedNotifications = true;
+
+      // Use addPostFrameCallback to ensure the BLoC is fully available
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          try {
+            context.read<NotificationBloc>()
+              ..add(LoadNotifications(userId: _profileId!))
+              ..add(SubscribeToNotifications(userId: _profileId!));
+
+            debugPrint(
+                '✅ Notification subscription initialized for user: $_profileId');
+          } catch (e) {
+            debugPrint('❌ Error initializing notifications: $e');
+          }
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // ✅ Unsubscribe when disposing
+    if (_profileId != null) {
+      try {
+        context.read<NotificationBloc>().add(
+              UnsubscribeFromNotifications(),
+            );
+      } catch (e) {
+        debugPrint('Error unsubscribing from notifications: $e');
+      }
+    }
+    super.dispose();
   }
 
   @override
@@ -120,7 +163,6 @@ class _MerchandiserLayoutPageState extends State<MerchandiserLayoutPage> {
       ),
       if (_merchandiserId != null)
         CustomersPage(merchandiserId: _merchandiserId!),
-      // ✅ Real chat page with BLoC provider
       if (_merchandiserId != null)
         BlocProvider(
           create: (context) => sl<ChatBloc>()
@@ -138,43 +180,57 @@ class _MerchandiserLayoutPageState extends State<MerchandiserLayoutPage> {
         BlocProvider.value(value: sl<AuthBloc>()),
         BlocProvider(create: (context) => sl<NotificationBloc>(), lazy: false),
       ],
-      child: Scaffold(
-        appBar: MerchandiserCustomAppBar(),
-        body: Row(
-          children: [
-            if (isWideScreen)
-              NavigationRail(
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                labelType: NavigationRailLabelType.all,
-                destinations: _destinations
-                    .map(
-                      (dest) => NavigationRailDestination(
-                        icon: dest.icon,
-                        selectedIcon: dest.selectedIcon,
-                        label: Text(dest.label),
-                      ),
-                    )
-                    .toList(),
-              ),
-            Expanded(child: pages[_selectedIndex]),
-          ],
+      child: BlocListener<NotificationBloc, NotificationState>(
+        listener: (context, state) {
+          // ✅ Show overlay when new notification arrives
+          if (state is NotificationLoaded &&
+              state.showOverlay &&
+              state.latestNotification != null) {
+            NotificationOverlay.show(
+              context,
+              state.latestNotification!,
+              merchandiserId: _merchandiserId,
+            );
+          }
+        },
+        child: Scaffold(
+          appBar: MerchandiserCustomAppBar(),
+          body: Row(
+            children: [
+              if (isWideScreen)
+                NavigationRail(
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  labelType: NavigationRailLabelType.all,
+                  destinations: _destinations
+                      .map(
+                        (dest) => NavigationRailDestination(
+                          icon: dest.icon,
+                          selectedIcon: dest.selectedIcon,
+                          label: Text(dest.label),
+                        ),
+                      )
+                      .toList(),
+                ),
+              Expanded(child: pages[_selectedIndex]),
+            ],
+          ),
+          bottomNavigationBar: isWideScreen
+              ? null
+              : NavigationBar(
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  destinations: _destinations,
+                ),
         ),
-        bottomNavigationBar: isWideScreen
-            ? null
-            : NavigationBar(
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                destinations: _destinations,
-              ),
       ),
     );
   }

@@ -23,8 +23,8 @@ class AdminCategoryCard extends StatelessWidget {
             children: [
               // Category Image or Icon
               Container(
-                width: 60,
-                height: 60,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   color: AppColors.grey200,
                   borderRadius: BorderRadius.circular(8),

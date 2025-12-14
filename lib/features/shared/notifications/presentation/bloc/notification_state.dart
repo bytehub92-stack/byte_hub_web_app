@@ -16,24 +16,42 @@ class NotificationLoading extends NotificationState {}
 class NotificationLoaded extends NotificationState {
   final List<NotificationModel> notifications;
   final int unreadCount;
+  final bool showOverlay;
+  final NotificationModel? latestNotification;
 
   const NotificationLoaded({
     required this.notifications,
     required this.unreadCount,
+    this.showOverlay = false,
+    this.latestNotification,
   });
 
+  // ✅ Add copyWith to properly update state
   NotificationLoaded copyWith({
     List<NotificationModel>? notifications,
     int? unreadCount,
+    bool? showOverlay,
+    NotificationModel? latestNotification,
+    bool clearLatest = false,
   }) {
     return NotificationLoaded(
       notifications: notifications ?? this.notifications,
       unreadCount: unreadCount ?? this.unreadCount,
+      showOverlay: showOverlay ?? false,
+      latestNotification:
+          clearLatest ? null : (latestNotification ?? this.latestNotification),
     );
   }
 
   @override
-  List<Object?> get props => [notifications, unreadCount];
+  List<Object?> get props => [
+        notifications,
+        unreadCount,
+        showOverlay,
+        latestNotification,
+        // ✅ Add timestamp to force updates
+        DateTime.now().millisecondsSinceEpoch,
+      ];
 }
 
 class NotificationError extends NotificationState {

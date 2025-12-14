@@ -40,6 +40,8 @@ class NotificationRemoteDataSource {
           .eq('user_id', userId)
           .eq('is_read', false);
 
+      print('notification remote datasource: unread count $response');
+
       return (response as List).length;
     } catch (e) {
       return 0;
@@ -49,10 +51,11 @@ class NotificationRemoteDataSource {
   /// Mark notification as read
   Future<void> markAsRead({required String notificationId}) async {
     try {
+      print('notification remote datasource: now will mark as read');
       await _supabase
           .from('notifications')
-          .update({'is_read': true})
-          .eq('id', notificationId);
+          .update({'is_read': true}).eq('id', notificationId);
+      print('notification remote datasource: now marked as read');
     } catch (e) {
       throw Exception('Failed to mark notification as read: $e');
     }
@@ -66,6 +69,7 @@ class NotificationRemoteDataSource {
           .update({'is_read': true})
           .eq('user_id', userId)
           .eq('is_read', false);
+      print('notification remote datasource: now marked all as read');
     } catch (e) {
       throw Exception('Failed to mark all notifications as read: $e');
     }
@@ -74,7 +78,9 @@ class NotificationRemoteDataSource {
   /// Delete notification
   Future<void> deleteNotification({required String notificationId}) async {
     try {
+      print('notification remote datasource: now will delete notification');
       await _supabase.from('notifications').delete().eq('id', notificationId);
+      print('notification remote datasource: now notification deleted');
     } catch (e) {
       throw Exception('Failed to delete notification: $e');
     }
@@ -149,10 +155,14 @@ class NotificationRemoteDataSource {
               value: userId,
             ),
             callback: (payload) {
-              final notification = NotificationModel.fromJson(
-                payload.newRecord,
-              );
-              _streamControllers[userId]?.add(notification);
+              try {
+                final notification =
+                    NotificationModel.fromJson(payload.newRecord);
+                _streamControllers[userId]?.add(notification);
+                print('✅ Notification added to stream: ${notification.id}');
+              } catch (e) {
+                print('❌ Error parsing notification: $e');
+              }
             },
           )
           .subscribe();

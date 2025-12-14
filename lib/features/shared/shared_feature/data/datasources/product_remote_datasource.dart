@@ -6,7 +6,7 @@ abstract class ProductRemoteDataSource {
   Future<List<ProductModel>> getProductsBySubCategory({
     required String subCategoryId,
     int page = 1,
-    int limit = 20,
+    int limit = 18,
     String? searchQuery,
     String? sortBy,
   });
@@ -28,7 +28,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   Future<List<ProductModel>> getProductsBySubCategory({
     required String subCategoryId,
     int page = 1,
-    int limit = 20,
+    int limit = 18,
     String? searchQuery,
     String? sortBy,
   }) async {

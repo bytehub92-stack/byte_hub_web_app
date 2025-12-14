@@ -19,8 +19,6 @@ dependencies:
   loading_animation_widget:
   font_awesome_flutter:
   intl:
-  # ❌ REMOVED: image_picker_web (causes web conflicts)
-  # ✅ REPLACED WITH: file_picker (works on all platforms)
   file_picker: ^8.1.4
   flutter_dotenv:
   flutter_bloc:
@@ -37,6 +35,7 @@ dependencies:
   image: ^4.5.4
   uuid:
   qr_flutter:
+  timeago: ^3.6.1
 
 dev_dependencies:
   flutter_test:

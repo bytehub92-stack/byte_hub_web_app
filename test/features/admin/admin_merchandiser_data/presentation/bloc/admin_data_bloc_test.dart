@@ -1,8 +1,8 @@
 // test/features/admin/admin_merchandiser_data/bloc/merchandiser_data_bloc_test.dart
 
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_bloc.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_event.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_states.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_bloc.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_event.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_states.dart';
 import 'package:admin_panel/features/shared/shared_feature/data/repositories/category_repository_impl.dart';
 import 'package:admin_panel/features/shared/shared_feature/data/repositories/product_repository_impl.dart';
 import 'package:admin_panel/features/shared/shared_feature/data/repositories/sub_category_repositoy_impl.dart';
@@ -12,12 +12,12 @@ import 'package:admin_panel/features/shared/shared_feature/domain/usecases/get_s
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../../shared/store_management/data/datasources/fake_category_remote_datasource.dart';
-import '../../../../shared/store_management/data/datasources/fake_product_remote_datasource.dart';
-import '../../../../shared/store_management/data/datasources/fake_sub_category_remote_datasource.dart';
+import '../../../../shared/store_management/data/fake_datasources/fake_category_remote_datasource.dart';
+import '../../../../shared/store_management/data/fake_datasources/fake_product_remote_datasource.dart';
+import '../../../../shared/store_management/data/fake_datasources/fake_sub_category_remote_datasource.dart';
 
 void main() {
-  late MerchandiserDataBloc bloc;
+  late AdminDataBloc bloc;
   late GetCategoriesByMerchandiserIdUseCase
       getCategoriesByMerchandiserIdUseCase;
   late GetSubCategoriesByCategoryId getSubCategoriesUseCase;
@@ -51,7 +51,7 @@ void main() {
     );
     getProductsUseCase = GetProductsBySubCategoryUsecase(productRepository);
 
-    bloc = MerchandiserDataBloc(
+    bloc = AdminDataBloc(
       getCategoriesByMerchandiserIdUseCase:
           getCategoriesByMerchandiserIdUseCase,
       getSubCategoriesByCategoryId: getSubCategoriesUseCase,
@@ -77,7 +77,7 @@ void main() {
     });
 
     group('AdminLoadCategories', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit [CategoriesLoading, CategoriesLoaded] when successful',
         build: () {
           fakeCategoryDataSource.seedData();
@@ -98,7 +98,7 @@ void main() {
         ],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit empty list when no categories exist for merchandiser',
         build: () {
           fakeCategoryDataSource.seedData();
@@ -114,7 +114,7 @@ void main() {
         ],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should return categories sorted by sort_order',
         build: () {
           fakeCategoryDataSource.seedData();
@@ -135,7 +135,7 @@ void main() {
         },
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit [CategoriesLoading, MerchandiserDataStateError] on failure',
         build: () {
           fakeCategoryDataSource.throwError('Database error');
@@ -155,7 +155,7 @@ void main() {
     });
 
     group('AdminLoadSubCategories', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit [SubCategoriesLoading, SubCategoriesLoaded] when successful',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -176,7 +176,7 @@ void main() {
         ],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should select first sub-category automatically',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -191,7 +191,7 @@ void main() {
         },
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit empty list when no sub-categories exist',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -211,7 +211,7 @@ void main() {
         ],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit [SubCategoriesLoading, MerchandiserDataStateError] on failure',
         build: () {
           fakeSubCategoryDataSource.throwError('Database error');
@@ -231,7 +231,7 @@ void main() {
     });
 
     group('AdminLoadProducts', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit [ProductsLoading, ProductsLoaded] when successful',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -262,7 +262,7 @@ void main() {
         ],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should handle pagination correctly',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -287,7 +287,7 @@ void main() {
         },
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should apply search filter',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -316,7 +316,7 @@ void main() {
         },
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should apply sort by price ascending',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -346,7 +346,7 @@ void main() {
         },
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit [ProductsLoading, MerchandiserDataStateError] on failure',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -374,7 +374,7 @@ void main() {
     });
 
     group('AdminLoadMoreProducts', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should load next page of products',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -409,7 +409,7 @@ void main() {
         ],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should not load more when hasMore is false',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -433,7 +433,7 @@ void main() {
         expect: () => [],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should emit error on failure while loading more',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -468,7 +468,7 @@ void main() {
     });
 
     group('AdminSearchProducts', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should reload products with search query',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -502,7 +502,7 @@ void main() {
         ],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should clear search when query is empty',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -536,7 +536,7 @@ void main() {
     });
 
     group('AdminSortProducts', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should reload products with new sort order',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -577,7 +577,7 @@ void main() {
         },
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should maintain search query when sorting',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -608,7 +608,7 @@ void main() {
     });
 
     group('Edge Cases', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should handle rapid event firing',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -626,7 +626,7 @@ void main() {
         expect: () => [ProductsLoading(), isA<ProductsLoaded>()],
       );
 
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should handle empty products gracefully',
         build: () {
           fakeSubCategoryDataSource.seedData();
@@ -651,7 +651,7 @@ void main() {
     });
 
     group('Integration Tests', () {
-      blocTest<MerchandiserDataBloc, MerchandiserDataState>(
+      blocTest<AdminDataBloc, AdminDataState>(
         'should handle complete flow: categories -> subcategories -> products',
         build: () {
           fakeCategoryDataSource.seedData();

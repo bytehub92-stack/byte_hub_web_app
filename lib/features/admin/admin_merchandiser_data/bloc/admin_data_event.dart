@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 
-abstract class MerchandiserDataEvent extends Equatable {
+abstract class AdminDataEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }
 
-class AdminLoadCategories extends MerchandiserDataEvent {
+class AdminLoadCategories extends AdminDataEvent {
   final String merchandiserId;
   AdminLoadCategories({required this.merchandiserId});
 
@@ -13,7 +13,7 @@ class AdminLoadCategories extends MerchandiserDataEvent {
   List<Object> get props => [merchandiserId];
 }
 
-class AdminLoadSubCategories extends MerchandiserDataEvent {
+class AdminLoadSubCategories extends AdminDataEvent {
   final String categoryId;
 
   AdminLoadSubCategories({required this.categoryId});
@@ -22,7 +22,7 @@ class AdminLoadSubCategories extends MerchandiserDataEvent {
   List<Object> get props => [categoryId];
 }
 
-class AdminLoadProducts extends MerchandiserDataEvent {
+class AdminLoadProducts extends AdminDataEvent {
   final String subCategoryId;
   final int page;
   final int limit;
@@ -41,9 +41,9 @@ class AdminLoadProducts extends MerchandiserDataEvent {
   List<Object?> get props => [subCategoryId, page, searchQuery, sortBy];
 }
 
-class AdminLoadMoreProducts extends MerchandiserDataEvent {}
+class AdminLoadMoreProducts extends AdminDataEvent {}
 
-class AdminSearchProducts extends MerchandiserDataEvent {
+class AdminSearchProducts extends AdminDataEvent {
   final String query;
 
   AdminSearchProducts({required this.query});
@@ -52,7 +52,7 @@ class AdminSearchProducts extends MerchandiserDataEvent {
   List<Object> get props => [query];
 }
 
-class AdminSortProducts extends MerchandiserDataEvent {
+class AdminSortProducts extends AdminDataEvent {
   final String sortBy;
 
   AdminSortProducts({required this.sortBy});

@@ -99,7 +99,7 @@ import '../../features/shared/auth/domain/repositories/auth_repository.dart';
 import '../../features/shared/auth/domain/usecases/login_usecase.dart';
 import '../../features/shared/auth/presentation/bloc/auth_bloc.dart';
 
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_bloc.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_bloc.dart';
 
 import 'package:admin_panel/features/admin/admin_merchandiser_management/data/datasources/admin_remote_datasource.dart';
 import 'package:admin_panel/features/admin/admin_merchandiser_management/data/repositories/merchandiser_repository_impl.dart';
@@ -218,7 +218,7 @@ Future<void> initializeDependencies() async {
 
   // Merchandiser Data
   sl.registerFactory(
-    () => MerchandiserDataBloc(
+    () => AdminDataBloc(
       getCategoriesByMerchandiserIdUseCase: sl(),
       getSubCategoriesByCategoryId: sl(),
       getProductsBySubCategoryUsecase: sl(),

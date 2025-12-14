@@ -7,9 +7,9 @@ import 'package:admin_panel/features/shared/auth/presentation/bloc/auth_bloc.dar
 import 'package:admin_panel/features/shared/auth/presentation/bloc/auth_event.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_event.dart';
+import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_state.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/pages/notifications_page.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/widgets/notification_badge.dart';
-
 import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_bloc.dart';
 import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_event.dart';
 import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_state.dart';
@@ -33,6 +33,7 @@ class MerchandiserCustomAppBar extends StatefulWidget
 class _MerchandiserCustomAppBarState extends State<MerchandiserCustomAppBar> {
   String? _profileId;
   bool _notificationsInitialized = false;
+  late NotificationBloc bloc;
 
   @override
   void initState() {
@@ -53,7 +54,7 @@ class _MerchandiserCustomAppBarState extends State<MerchandiserCustomAppBar> {
     if (_profileId == null || _notificationsInitialized) return;
 
     try {
-      context.read<NotificationBloc>()
+      bloc = context.read<NotificationBloc>()
         ..add(LoadNotifications(userId: _profileId!))
         ..add(SubscribeToNotifications(userId: _profileId!));
 
@@ -162,21 +163,25 @@ class _MerchandiserCustomAppBarState extends State<MerchandiserCustomAppBar> {
         ],
       ),
       actions: [
-        NotificationBadge(
-          child: IconButton(
-            onPressed: () {
-              if (_profileId != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        NotificationsPage(userId: _profileId!),
-                  ),
-                );
-              }
-            },
-            icon: const Icon(Icons.notifications),
-          ),
+        BlocBuilder<NotificationBloc, NotificationState>(
+          builder: (context, state) {
+            return NotificationBadge(
+              child: IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                onPressed: () {
+                  // Pass the BLoC instance through navigation
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (navContext) => BlocProvider.value(
+                        value: context.read<NotificationBloc>(),
+                        child: NotificationsPage(userId: _profileId ?? ''),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
         ),
         const SizedBox(width: 20),
       ],
@@ -187,8 +192,8 @@ class _MerchandiserCustomAppBarState extends State<MerchandiserCustomAppBar> {
     // Unsubscribe from notifications
     try {
       context.read<NotificationBloc>().add(
-        const UnsubscribeFromNotifications(),
-      );
+            const UnsubscribeFromNotifications(),
+          );
     } catch (e) {
       // Ignore if bloc not available
     }

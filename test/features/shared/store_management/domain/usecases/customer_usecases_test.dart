@@ -8,7 +8,7 @@ import 'package:admin_panel/features/shared/shared_feature/domain/usecases/custo
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../data/datasources/fake_customer_remote_datasource.dart';
+import '../../data/fake_datasources/fake_customer_remote_datasource.dart';
 
 void main() {
   late GetCustomersByMerchandiser getCustomersUseCase;

@@ -4,7 +4,7 @@ import 'package:admin_panel/core/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-enum NotificationTarget { allUsers, merchandisersOnly, customersOnly, both }
+enum NotificationTarget { allUsers, merchandisersOnly, customersOnly }
 
 class AdminSendNotificationDialog extends StatefulWidget {
   const AdminSendNotificationDialog({super.key});
@@ -70,16 +70,6 @@ class _AdminSendNotificationDialogState
               .from('profiles')
               .select('id')
               .eq('user_type', 'customer')
-              .eq('is_active', true);
-          userIds = (response as List).map((e) => e['id'] as String).toList();
-          break;
-
-        case NotificationTarget.both:
-          // Get both merchandisers and customers
-          final response = await supabase
-              .from('profiles')
-              .select('id')
-              .inFilter('user_type', ['merchandiser', 'customer'])
               .eq('is_active', true);
           userIds = (response as List).map((e) => e['id'] as String).toList();
           break;
@@ -196,12 +186,6 @@ class _AdminSendNotificationDialogState
                   'Customers Only',
                   'Send only to customers',
                   Icons.person,
-                ),
-                _buildTargetOption(
-                  NotificationTarget.both,
-                  'Merchandisers & Customers',
-                  'Send to both merchandisers and customers',
-                  Icons.groups,
                 ),
 
                 const SizedBox(height: 24),

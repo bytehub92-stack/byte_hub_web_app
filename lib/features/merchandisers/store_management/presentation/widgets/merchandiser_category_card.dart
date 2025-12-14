@@ -40,6 +40,7 @@ class MerchandiserCategoryCard extends StatelessWidget {
                   // Category Image
                   category.imageThumbnail != null
                       ? CachedNetworkImage(
+                          height: 250,
                           imageUrl: category.imageThumbnail!,
                           placeholder: (context, url) =>
                               const Center(child: CircularProgressIndicator()),
@@ -222,11 +223,11 @@ class MerchandiserCategoryCard extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               context.read<CategoryBloc>().add(
-                DeleteCategory(
-                  categoryId: category.id,
-                  merchandiserId: merchandiserId,
-                ),
-              );
+                    DeleteCategory(
+                      categoryId: category.id,
+                      merchandiserId: merchandiserId,
+                    ),
+                  );
               Navigator.pop(dialogContext);
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),

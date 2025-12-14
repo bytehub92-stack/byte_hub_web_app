@@ -1,19 +1,18 @@
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_event.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/merchandiser_data_states.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_event.dart';
+import 'package:admin_panel/features/admin/admin_merchandiser_data/bloc/admin_data_states.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/entities/sub_category.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/usecases/get_categories_usecase.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/usecases/get_products_usecase.dart';
 import 'package:admin_panel/features/shared/shared_feature/domain/usecases/get_sub_categories_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class MerchandiserDataBloc
-    extends Bloc<MerchandiserDataEvent, MerchandiserDataState> {
+class AdminDataBloc extends Bloc<AdminDataEvent, AdminDataState> {
   final GetCategoriesByMerchandiserIdUseCase
       getCategoriesByMerchandiserIdUseCase;
   final GetSubCategoriesByCategoryId getSubCategoriesByCategoryId;
   final GetProductsBySubCategoryUsecase getProductsBySubCategoryUsecase;
 
-  MerchandiserDataBloc({
+  AdminDataBloc({
     required this.getCategoriesByMerchandiserIdUseCase,
     required this.getSubCategoriesByCategoryId,
     required this.getProductsBySubCategoryUsecase,
@@ -28,7 +27,7 @@ class MerchandiserDataBloc
 
   Future<void> _onAdminLoadCategories(
     AdminLoadCategories event,
-    Emitter<MerchandiserDataState> emit,
+    Emitter<AdminDataState> emit,
   ) async {
     emit(CategoriesLoading());
     final result =
@@ -47,7 +46,7 @@ class MerchandiserDataBloc
 
   Future<void> _onLoadSubCategories(
     AdminLoadSubCategories event,
-    Emitter<MerchandiserDataState> emit,
+    Emitter<AdminDataState> emit,
   ) async {
     emit(SubCategoriesLoading());
 
@@ -74,8 +73,9 @@ class MerchandiserDataBloc
 
   Future<void> _onLoadProducts(
     AdminLoadProducts event,
-    Emitter<MerchandiserDataState> emit,
+    Emitter<AdminDataState> emit,
   ) async {
+    emit(ProductsLoading());
     // Get current sub-categories from state
     List<SubCategory> subCategories = [];
     if (state is SubCategoriesLoaded) {
@@ -93,7 +93,6 @@ class MerchandiserDataBloc
     );
 
     try {
-      emit(ProductsLoading());
       final result = await getProductsBySubCategoryUsecase(params);
 
       result.fold(
@@ -121,7 +120,7 @@ class MerchandiserDataBloc
 
   Future<void> _onLoadMoreProducts(
     AdminLoadMoreProducts event,
-    Emitter<MerchandiserDataState> emit,
+    Emitter<AdminDataState> emit,
   ) async {
     final currentState = state;
     if (currentState is! ProductsLoaded || !currentState.hasMore) {
@@ -174,7 +173,7 @@ class MerchandiserDataBloc
 
   Future<void> _onSearchProducts(
     AdminSearchProducts event,
-    Emitter<MerchandiserDataState> emit,
+    Emitter<AdminDataState> emit,
   ) async {
     final currentState = state;
     if (currentState is! ProductsLoaded) return;
@@ -189,7 +188,7 @@ class MerchandiserDataBloc
 
   Future<void> _onSortProducts(
     AdminSortProducts event,
-    Emitter<MerchandiserDataState> emit,
+    Emitter<AdminDataState> emit,
   ) async {
     final currentState = state;
     if (currentState is! ProductsLoaded) return;

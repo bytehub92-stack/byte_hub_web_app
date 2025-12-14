@@ -76,10 +76,12 @@ class ProductCard extends StatelessWidget {
           aspectRatio: 1,
           child: product.images.isNotEmpty
               ? CachedNetworkImage(
+                  height: 300,
                   imageUrl: product.images.first,
                   placeholder: (context, url) =>
                       const Center(child: CircularProgressIndicator()),
                   fit: BoxFit.cover,
+                  width: double.infinity,
                   errorWidget: (context, error, stackTrace) {
                     return _buildPlaceholder();
                   },
