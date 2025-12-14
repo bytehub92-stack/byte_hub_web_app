@@ -2,6 +2,7 @@
 
 import 'package:admin_panel/core/widgets/platform_refresh_wrapper.dart';
 import 'package:admin_panel/features/shared/orders/domain/entities/order.dart';
+import 'package:admin_panel/features/shared/orders/presentation/pages/order_details_page.dart';
 import 'package:admin_panel/features/shared/orders/presentation/widgets/order_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -362,8 +363,15 @@ class _DriverDetailsPageState extends State<DriverDetailsPage> {
         OrderCard(
           order: order,
           onTap: () {
-            // Navigate to order details if needed
-            // You can implement this later
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OrderDetailsPage(
+                  orderId: order.id,
+                  isAdminView: false,
+                ),
+              ),
+            );
           },
         ),
         if (assignment.notes != null) ...[

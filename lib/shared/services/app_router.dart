@@ -12,7 +12,6 @@ import 'package:admin_panel/features/merchandisers/chats/presentation/pages/chat
 import 'package:admin_panel/features/admin/admin_merchandiser_management/presentation/pages/admin_dashboard_page.dart';
 import 'package:admin_panel/features/admin/admin_merchandiser_management/presentation/pages/admin_merchandiser_management_page.dart';
 import 'package:admin_panel/features/merchandisers/store_management/presentation/pages/merchandiser_layout_overview_page.dart';
-import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/pages/notifications_page.dart';
 import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_bloc.dart';
 import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_event.dart';
