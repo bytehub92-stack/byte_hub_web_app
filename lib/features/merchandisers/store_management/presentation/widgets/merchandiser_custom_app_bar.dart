@@ -10,9 +10,9 @@ import 'package:admin_panel/features/shared/notifications/presentation/bloc/noti
 import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_state.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/pages/notifications_page.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/widgets/notification_badge.dart';
-import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_bloc.dart';
-import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_event.dart';
-import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_state.dart';
+import 'package:admin_panel/features/merchandisers/profile/presentation/bloc/profile_bloc.dart';
+import 'package:admin_panel/features/merchandisers/profile/presentation/bloc/profile_event.dart';
+import 'package:admin_panel/features/merchandisers/profile/presentation/bloc/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';

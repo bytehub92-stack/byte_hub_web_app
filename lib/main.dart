@@ -2,6 +2,7 @@ import 'package:admin_panel/app_bloc_observer.dart';
 import 'package:admin_panel/core/services/auth_service.dart';
 import 'package:admin_panel/core/services/theme_service.dart';
 import 'package:admin_panel/core/theme/app_theme.dart';
+import 'package:admin_panel/features/shared/auth/presentation/bloc/auth_bloc.dart';
 import 'package:admin_panel/shared/services/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
@@ -58,16 +59,19 @@ class MyApp extends StatelessWidget {
       create: (_) => sl<ThemeService>(),
       child: Consumer<ThemeService>(
         builder: (context, themeService, child) {
-          return MaterialApp.router(
-            routerConfig: AppRouter.router(authService),
-            title: 'Byte Hub Admin Panel',
-            debugShowCheckedModeBanner: false,
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeService.materialThemeMode,
+          return BlocProvider(
+            create: (context) => sl<AuthBloc>(),
+            child: MaterialApp.router(
+              routerConfig: AppRouter.router(authService),
+              title: 'Byte Hub Admin Panel',
+              debugShowCheckedModeBanner: false,
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeService.materialThemeMode,
+            ),
           );
         },
       ),

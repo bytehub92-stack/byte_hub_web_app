@@ -13,9 +13,9 @@ import 'package:admin_panel/features/admin/admin_merchandiser_management/present
 import 'package:admin_panel/features/admin/admin_merchandiser_management/presentation/pages/admin_merchandiser_management_page.dart';
 import 'package:admin_panel/features/merchandisers/store_management/presentation/pages/merchandiser_layout_overview_page.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/pages/notifications_page.dart';
-import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_bloc.dart';
-import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_event.dart';
-import 'package:admin_panel/features/shared/profile/presentation/pages/merchandiser_profile_page.dart';
+import 'package:admin_panel/features/merchandisers/profile/presentation/bloc/profile_bloc.dart';
+import 'package:admin_panel/features/merchandisers/profile/presentation/bloc/profile_event.dart';
+import 'package:admin_panel/features/merchandisers/profile/presentation/pages/merchandiser_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';

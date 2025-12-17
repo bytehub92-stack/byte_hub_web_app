@@ -29,24 +29,29 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw const ServerException(message: 'Login failed: No user returned');
       }
 
-      // Get user profile data from your users table
+      // Get user profile data - FIXED: Now includes full_name and must_change_password
       final userProfileResponse = await supabaseClient
           .from(ApiConstants.profilesTable)
-          .select('is_active, user_type')
+          .select(
+              'id, email, full_name, user_type, is_active, must_change_password')
           .eq('id', response.user!.id)
           .single();
 
       DebugConfig.logInfo('User profile data: $userProfileResponse');
 
-      // Check if user is active
+      // Check if user is active - THIS CHECK NOW WORKS
       if (userProfileResponse['is_active'] != true) {
+        // Sign out the user immediately
+        await supabaseClient.auth.signOut();
         throw const ServerException(message: 'Account has been deactivated');
       }
+
       // Validate user_type (only admin and merchandiser can login)
-      final userType = userProfileResponse['user_type']
-          ?.toString()
-          .toLowerCase();
+      final userType =
+          userProfileResponse['user_type']?.toString().toLowerCase();
       if (userType == null || !['admin', 'merchandiser'].contains(userType)) {
+        // Sign out the user immediately
+        await supabaseClient.auth.signOut();
         throw ServerException(
           message: 'Invalid user type for this application: $userType',
         );
@@ -74,6 +79,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on PostgrestException catch (e) {
       DebugConfig.logError('Supabase database error', error: e);
       throw ServerException(message: 'Database error: ${e.message}');
+    } on ServerException {
+      // Re-throw ServerException as-is (already has proper message)
+      rethrow;
     } catch (e, stackTrace) {
       DebugConfig.logError(
         'Unexpected Supabase login error',

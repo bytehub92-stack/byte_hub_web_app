@@ -1,20 +1,20 @@
-import 'package:admin_panel/features/shared/offers/data/models/offer_model.dart';
-import 'package:admin_panel/features/shared/offers/data/repositories/offers_repository_impl.dart';
-import 'package:admin_panel/features/shared/offers/domain/entities/offer.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/create_offer_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/delete_offer_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/get_offer_by_id_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/get_offers_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/toggle_offer_status_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/update_offer_usecase.dart';
-import 'package:admin_panel/features/shared/offers/presentation/bloc/offers_bloc.dart';
-import 'package:admin_panel/features/shared/offers/presentation/bloc/offers_event.dart';
-import 'package:admin_panel/features/shared/offers/presentation/bloc/offers_state.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/models/offer_model.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/repositories/offers_repository_impl.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/entities/offer.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/create_offer_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/delete_offer_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/get_offer_by_id_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/get_offers_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/toggle_offer_status_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/update_offer_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/presentation/bloc/offers_bloc.dart';
+import 'package:admin_panel/features/merchandisers/offers/presentation/bloc/offers_event.dart';
+import 'package:admin_panel/features/merchandisers/offers/presentation/bloc/offers_state.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../../data/datasources/fake_offers_remote_datasource.dart';
 import '../services/fake_offer_notification_service.dart';
-import 'package:admin_panel/features/shared/offers/data/services/offer_notification_service.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/services/offer_notification_service.dart';
 
 void main() {
   late OffersBloc bloc;

@@ -23,7 +23,8 @@ import 'package:dartz/dartz.dart';
 // FAKE DATA SOURCES
 // ============================================================================
 
-class FakeMerchandiserRemoteDataSource implements MerchandiserRemoteDataSource {
+class FakeMerchandiserRemoteDataSource
+    implements AdminMerchandiserManagementRemoteDataSource {
   bool shouldThrowError = false;
 
   final List<MerchandiserModel> _fakeMerchandisers = [
@@ -354,44 +355,44 @@ class FakeNetworkInfo implements NetworkInfo {
 
 class TestFixtures {
   static Merchandiser get merchandiser1 => Merchandiser(
-    id: '1',
-    profileId: 'profile-1',
-    businessName: {'en': 'Test Business 1', 'ar': 'نشاط تجاري 1'},
-    businessType: {'en': 'Electronics', 'ar': 'إلكترونيات'},
-    description: {'en': 'Test description', 'ar': 'وصف الاختبار'},
-    isActive: true,
-    subscriptionPlan: 'premium',
-    createdAt: DateTime.parse('2024-01-01T00:00:00Z'),
-    updatedAt: DateTime.parse('2024-01-02T00:00:00Z'),
-    contactName: 'John Doe',
-    email: 'john@example.com',
-    phoneNumber: '+1234567890',
-    totalCustomers: 100,
-    totalCategories: 10,
-    totalProducts: 500,
-    totalOrders: 1000,
-    totalRevenue: 50000.0,
-  );
+        id: '1',
+        profileId: 'profile-1',
+        businessName: {'en': 'Test Business 1', 'ar': 'نشاط تجاري 1'},
+        businessType: {'en': 'Electronics', 'ar': 'إلكترونيات'},
+        description: {'en': 'Test description', 'ar': 'وصف الاختبار'},
+        isActive: true,
+        subscriptionPlan: 'premium',
+        createdAt: DateTime.parse('2024-01-01T00:00:00Z'),
+        updatedAt: DateTime.parse('2024-01-02T00:00:00Z'),
+        contactName: 'John Doe',
+        email: 'john@example.com',
+        phoneNumber: '+1234567890',
+        totalCustomers: 100,
+        totalCategories: 10,
+        totalProducts: 500,
+        totalOrders: 1000,
+        totalRevenue: 50000.0,
+      );
 
   static Merchandiser get merchandiser2 => Merchandiser(
-    id: '2',
-    profileId: 'profile-2',
-    businessName: {'en': 'Test Business 2', 'ar': 'نشاط تجاري 2'},
-    businessType: {'en': 'Fashion', 'ar': 'أزياء'},
-    isActive: false,
-    subscriptionPlan: 'basic',
-    createdAt: DateTime.parse('2024-01-03T00:00:00Z'),
-    updatedAt: DateTime.parse('2024-01-04T00:00:00Z'),
-  );
+        id: '2',
+        profileId: 'profile-2',
+        businessName: {'en': 'Test Business 2', 'ar': 'نشاط تجاري 2'},
+        businessType: {'en': 'Fashion', 'ar': 'أزياء'},
+        isActive: false,
+        subscriptionPlan: 'basic',
+        createdAt: DateTime.parse('2024-01-03T00:00:00Z'),
+        updatedAt: DateTime.parse('2024-01-04T00:00:00Z'),
+      );
 
   static AdminStats get adminStats => const AdminStats(
-    totalMerchandisers: 50,
-    totalCustomers: 1000,
-    totalCategories: 20,
-    totalProducts: 500,
-    activeMerchandisers: 45,
-    inactiveCustomers: 100,
-  );
+        totalMerchandisers: 50,
+        totalCustomers: 1000,
+        totalCategories: 20,
+        totalProducts: 500,
+        activeMerchandisers: 45,
+        inactiveCustomers: 100,
+      );
 
   static CreateMerchandiserRequest get createRequest =>
       CreateMerchandiserRequest(
@@ -407,31 +408,31 @@ class TestFixtures {
       );
 
   static Map<String, dynamic> get merchandiserJson => {
-    'id': '1',
-    'profile_id': 'profile-1',
-    'business_name': {'en': 'Test Business', 'ar': 'نشاط تجاري'},
-    'business_type': {'en': 'Electronics', 'ar': 'إلكترونيات'},
-    'description': {'en': 'Test description', 'ar': 'وصف الاختبار'},
-    'is_active': true,
-    'subscription_plan': 'premium',
-    'created_at': '2024-01-01T00:00:00.000Z',
-    'updated_at': '2024-01-02T00:00:00.000Z',
-    'contact_name': 'John Doe',
-    'email': 'john@example.com',
-    'phone_number': '+1234567890',
-    'total_customers': 100,
-    'total_categories': 10,
-    'total_products': 500,
-    'total_orders': 1000,
-    'total_revenue': 50000.0,
-  };
+        'id': '1',
+        'profile_id': 'profile-1',
+        'business_name': {'en': 'Test Business', 'ar': 'نشاط تجاري'},
+        'business_type': {'en': 'Electronics', 'ar': 'إلكترونيات'},
+        'description': {'en': 'Test description', 'ar': 'وصف الاختبار'},
+        'is_active': true,
+        'subscription_plan': 'premium',
+        'created_at': '2024-01-01T00:00:00.000Z',
+        'updated_at': '2024-01-02T00:00:00.000Z',
+        'contact_name': 'John Doe',
+        'email': 'john@example.com',
+        'phone_number': '+1234567890',
+        'total_customers': 100,
+        'total_categories': 10,
+        'total_products': 500,
+        'total_orders': 1000,
+        'total_revenue': 50000.0,
+      };
 
   static Map<String, dynamic> get adminStatsJson => {
-    'total_merchandisers': 50,
-    'total_customers': 1000,
-    'total_categories': 20,
-    'total_products': 500,
-    'active_merchandisers': 45,
-    'inactive_customers': 100,
-  };
+        'total_merchandisers': 50,
+        'total_customers': 1000,
+        'total_categories': 20,
+        'total_products': 500,
+        'active_merchandisers': 45,
+        'inactive_customers': 100,
+      };
 }

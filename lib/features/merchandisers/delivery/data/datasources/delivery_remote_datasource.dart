@@ -33,18 +33,11 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
   Future<List<DriverModel>> getDrivers(String merchandiserId) async {
     try {
       final response = await supabaseClient
-          .from('drivers')
-          .select('''
-            *,
-            profiles!drivers_profile_id_fkey(
-              full_name,
-              email,
-              phone_number,
-              avatar_url
-            )
-          ''')
+          .from('drivers_with_stats') // Use the view instead
+          .select('*')
           .eq('merchandiser_id', merchandiserId)
           .order('created_at', ascending: false);
+
       return (response as List).map((json) {
         return DriverModel.fromJson(json as Map<String, dynamic>);
       }).toList();
@@ -59,16 +52,8 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
   Future<DriverModel> getDriverById(String driverId) async {
     try {
       final response = await supabaseClient
-          .from('drivers')
-          .select('''
-            *,
-            profiles!drivers_profile_id_fkey(
-              full_name,
-              email,
-              phone_number,
-              avatar_url
-            )
-          ''')
+          .from('drivers_with_stats') // Use the view instead
+          .select('*')
           .eq('id', driverId)
           .single();
 
@@ -98,16 +83,13 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
       }
 
       // Create assignment
-      final response = await supabaseClient
-          .from('order_assignments')
-          .insert({
-            'order_id': orderId,
-            'driver_id': driverId,
-            'assigned_by': assignedBy,
-            'notes': notes,
-            'delivery_status': 'assigned',
-          })
-          .select('''
+      final response = await supabaseClient.from('order_assignments').insert({
+        'order_id': orderId,
+        'driver_id': driverId,
+        'assigned_by': assignedBy,
+        'notes': notes,
+        'delivery_status': 'assigned',
+      }).select('''
           *,
           orders!order_assignments_order_id_fkey(
             order_number,
@@ -126,23 +108,12 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
               phone_number
             )
           )
-        ''')
-          .single();
+        ''').single();
 
       // Update order status to on_the_way
       await supabaseClient
           .from('orders')
-          .update({'status': 'on_the_way'})
-          .eq('id', orderId);
-
-      // // **NEW: Set driver as unavailable**
-      // await supabaseClient
-      //     .from('drivers')
-      //     .update({
-      //       'is_available': false,
-      //       'updated_at': DateTime.now().toIso8601String(),
-      //     })
-      //     .eq('id', driverId);
+          .update({'status': 'on_the_way'}).eq('id', orderId);
 
       return OrderAssignmentModel.fromJson(response);
     } catch (e) {
@@ -157,9 +128,7 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
     bool? onlyActive,
   }) async {
     try {
-      var query = supabaseClient
-          .from('order_assignments')
-          .select('''
+      var query = supabaseClient.from('order_assignments').select('''
         *,
         orders!order_assignments_order_id_fkey(
           order_number,
@@ -180,8 +149,7 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
             phone_number
           )
         )
-      ''')
-          .eq('drivers.merchandiser_id', merchandiserId);
+      ''').eq('drivers.merchandiser_id', merchandiserId);
 
       // Filter by driver if provided
       if (driverId != null) {
@@ -232,17 +200,7 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
       // Update order status back to confirmed or preparing
       await supabaseClient
           .from('orders')
-          .update({'status': 'preparing'})
-          .eq('id', orderId);
-
-      // // **NEW: Set driver back to available**
-      // await supabaseClient
-      //     .from('drivers')
-      //     .update({
-      //       'is_available': true,
-      //       'updated_at': DateTime.now().toIso8601String(),
-      //     })
-      //     .eq('id', driverId);
+          .update({'status': 'preparing'}).eq('id', orderId);
     } catch (e) {
       throw ServerException(
         message: 'Failed to unassign order: ${e.toString()}',
@@ -262,23 +220,20 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
           .eq('merchandiser_id', merchandiserId);
 
       final totalDrivers = (driversResponse as List).length;
-      final activeDrivers = driversResponse
-          .where((d) => d['is_active'] == true)
-          .length;
+      final activeDrivers =
+          driversResponse.where((d) => d['is_active'] == true).length;
       final availableDrivers = driversResponse
           .where((d) => d['is_available'] == true && d['is_active'] == true)
           .length;
 
       // Get order assignments
-      final assignmentsResponse = await supabaseClient
-          .from('order_assignments')
-          .select('''
+      final assignmentsResponse =
+          await supabaseClient.from('order_assignments').select('''
             id,
             delivery_status,
             delivered_at,
             drivers!order_assignments_driver_id_fkey(merchandiser_id)
-          ''')
-          .eq('drivers.merchandiser_id', merchandiserId);
+          ''').eq('drivers.merchandiser_id', merchandiserId);
 
       final assignments = assignmentsResponse as List;
       final totalAssignments = assignments.length;
@@ -291,9 +246,8 @@ class DeliveryRemoteDataSourceImpl implements DeliveryRemoteDataSource {
             ].contains(a['delivery_status']),
           )
           .length;
-      final completedDeliveries = assignments
-          .where((a) => a['delivery_status'] == 'delivered')
-          .length;
+      final completedDeliveries =
+          assignments.where((a) => a['delivery_status'] == 'delivered').length;
 
       return {
         'total_drivers': totalDrivers,

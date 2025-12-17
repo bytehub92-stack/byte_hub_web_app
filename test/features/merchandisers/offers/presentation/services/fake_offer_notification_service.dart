@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/shared/offers/data/services/offer_notification_service.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/services/offer_notification_service.dart';
 
 class FakeOfferNotificationService extends OfferNotificationService {
   final List<Map<String, dynamic>> sentNotifications = [];

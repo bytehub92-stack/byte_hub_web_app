@@ -1,5 +1,5 @@
-import 'package:admin_panel/features/shared/offers/data/models/offer_model.dart';
-import 'package:admin_panel/features/shared/offers/domain/entities/offer.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/models/offer_model.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/entities/offer.dart';
 
 /// Helper class to generate test data for offers
 class OfferTestData {

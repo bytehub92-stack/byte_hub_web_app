@@ -1,12 +1,15 @@
 // lib/features/admin/presentation/pages/admin_dashboard_page.dart
 
+import 'package:admin_panel/core/constants/route_constants.dart';
 import 'package:admin_panel/features/shared/auth/presentation/bloc/auth_bloc.dart';
 import 'package:admin_panel/features/admin/admin_merchandiser_management/presentation/bloc/admin_stats_bloc/admin_stats_bloc.dart';
 import 'package:admin_panel/features/admin/admin_merchandiser_management/presentation/bloc/admin_stats_bloc/admin_stats_event.dart';
 import 'package:admin_panel/features/admin/admin_merchandiser_management/presentation/bloc/admin_stats_bloc/admin_stats_state.dart';
-import 'package:admin_panel/features/admin/admin_merchandiser_management/presentation/widgets/admin_custom_app_bar.dart';
+import 'package:admin_panel/features/shared/auth/presentation/bloc/auth_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/theme/text_styles.dart';
 import '../../../../../core/theme/colors.dart';
@@ -51,11 +54,28 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
     final isWideScreen = MediaQuery.of(context).size.width >= 1200;
     return BlocProvider.value(
       value: sl<AuthBloc>(),
       child: Scaffold(
-        appBar: AdminCustomAppBar(),
+        appBar: AppBar(
+          centerTitle: false,
+          title: Text(
+            user?.email ?? '',
+            style: AppTextStyles.getBodyMedium(context),
+          ),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  _signOut(context);
+                },
+                icon: Icon(Icons.logout)),
+            SizedBox(
+              width: 8,
+            )
+          ],
+        ),
         body: Row(
           children: [
             if (isWideScreen)
@@ -93,6 +113,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               ),
       ),
     );
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    context.read<AuthBloc>().add(LogoutRequested());
+    context.go(RouteConstants.login);
   }
 }
 
@@ -158,8 +183,8 @@ class DashboardOverview extends StatelessWidget {
                           ElevatedButton(
                             onPressed: () {
                               context.read<AdminStatsBloc>().add(
-                                LoadAdminStats(),
-                              );
+                                    LoadAdminStats(),
+                                  );
                             },
                             child: const Text('Retry'),
                           ),
@@ -170,9 +195,8 @@ class DashboardOverview extends StatelessWidget {
 
                   if (state is AdminStatsLoaded) {
                     return GridView.count(
-                      crossAxisCount: MediaQuery.of(context).size.width < 600
-                          ? 2
-                          : 4,
+                      crossAxisCount:
+                          MediaQuery.of(context).size.width < 600 ? 2 : 4,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       children: [
