@@ -8,7 +8,7 @@ import '../../domain/repositories/merchandiser_repository.dart';
 import '../datasources/admin_remote_datasource.dart';
 
 class MerchandiserRepositoryImpl implements MerchandiserRepository {
-  final MerchandiserRemoteDataSource remoteDataSource;
+  final AdminMerchandiserManagementRemoteDataSource remoteDataSource;
   final NetworkInfo networkInfo;
 
   MerchandiserRepositoryImpl({

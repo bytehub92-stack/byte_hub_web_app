@@ -1,8 +1,8 @@
 import 'package:admin_panel/core/di/injection_container.dart';
 import 'package:admin_panel/core/theme/colors.dart';
 import 'package:admin_panel/core/theme/text_styles.dart';
-import 'package:admin_panel/features/shared/offers/presentation/widgets/offer_badge_widget.dart';
-import 'package:admin_panel/features/shared/offers/services/offer_indicator_service.dart';
+import 'package:admin_panel/features/merchandisers/offers/presentation/widgets/offer_badge_widget.dart';
+import 'package:admin_panel/features/merchandisers/offers/services/offer_indicator_service.dart';
 
 import 'package:admin_panel/features/shared/shared_feature/domain/entities/sub_category.dart';
 import 'package:flutter/material.dart';

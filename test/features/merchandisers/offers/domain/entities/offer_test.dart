@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/shared/offers/domain/entities/offer.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/entities/offer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

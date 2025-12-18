@@ -4,14 +4,15 @@ import '../../../../../core/helpers/jsonb_helper.dart';
 import '../../domain/entities/create_merchandiser_request.dart';
 import '../models/merchandiser_model.dart';
 
-abstract class MerchandiserRemoteDataSource {
+abstract class AdminMerchandiserManagementRemoteDataSource {
   Future<List<MerchandiserModel>> getMerchandisers();
   Future<MerchandiserModel> getMerchandiserById(String id);
   Future<String> createMerchandiser(CreateMerchandiserRequest request);
   Future<void> updateMerchandiserStatus(String id, bool isActive);
 }
 
-class MerchandiserRemoteDataSourceImpl implements MerchandiserRemoteDataSource {
+class MerchandiserRemoteDataSourceImpl
+    implements AdminMerchandiserManagementRemoteDataSource {
   final SupabaseClient supabaseClient;
 
   MerchandiserRemoteDataSourceImpl({required this.supabaseClient});
@@ -74,16 +75,13 @@ class MerchandiserRemoteDataSourceImpl implements MerchandiserRemoteDataSource {
         throw ServerException(message: 'Failed to create auth user');
       }
       // Update profile
-      await supabaseClient
-          .from('profiles')
-          .update({
-            'user_type': 'merchandiser',
-            'is_approved': true,
-            'must_change_password': true,
-            'phone_number': request.phoneNumber,
-            'email_verified': true,
-          })
-          .eq('id', authResponse.user!.id);
+      await supabaseClient.from('profiles').update({
+        'user_type': 'merchandiser',
+        'is_approved': true,
+        'must_change_password': true,
+        'phone_number': request.phoneNumber,
+        'email_verified': true,
+      }).eq('id', authResponse.user!.id);
       // Create merchandiser record
       await supabaseClient.from('merchandisers').insert({
         'profile_id': authResponse.user!.id,
@@ -99,7 +97,6 @@ class MerchandiserRemoteDataSourceImpl implements MerchandiserRemoteDataSource {
           request.description,
           arabicValue: request.descriptionArabic,
         ),
-        'is_active': true,
       });
       return tempPassword;
     } on AuthException catch (e) {
@@ -114,10 +111,19 @@ class MerchandiserRemoteDataSourceImpl implements MerchandiserRemoteDataSource {
   @override
   Future<void> updateMerchandiserStatus(String id, bool isActive) async {
     try {
-      await supabaseClient
+      // First, get the profile_id from the merchandiser
+      final merchandiserResponse = await supabaseClient
           .from('merchandisers')
-          .update({'is_active': isActive})
-          .eq('id', id);
+          .select('profile_id')
+          .eq('id', id)
+          .single();
+
+      final profileId = merchandiserResponse['profile_id'] as String;
+
+      // Update the is_active status in the profiles table
+      await supabaseClient
+          .from('profiles')
+          .update({'is_active': isActive}).eq('id', profileId);
     } on PostgrestException catch (e) {
       throw ServerException(message: 'Failed to update status: ${e.message}');
     } catch (e) {

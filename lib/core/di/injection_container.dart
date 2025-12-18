@@ -34,19 +34,19 @@ import 'package:admin_panel/features/shared/notifications/data/repositories/noti
 import 'package:admin_panel/features/shared/notifications/data/services/notification_service.dart';
 import 'package:admin_panel/features/shared/notifications/domain/repositories/notification_repository.dart';
 import 'package:admin_panel/features/shared/notifications/presentation/bloc/notification_bloc.dart';
-import 'package:admin_panel/features/shared/offers/data/datasource/offers_remote_datasource.dart';
-import 'package:admin_panel/features/shared/offers/data/repositories/offers_repository_impl.dart';
-import 'package:admin_panel/features/shared/offers/data/services/offer_notification_service.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/datasource/offers_remote_datasource.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/repositories/offers_repository_impl.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/services/offer_notification_service.dart';
 
-import 'package:admin_panel/features/shared/offers/domain/repositories/offers_repository.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/create_offer_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/delete_offer_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/get_offer_by_id_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/get_offers_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/toggle_offer_status_usecase.dart';
-import 'package:admin_panel/features/shared/offers/domain/usecase/update_offer_usecase.dart';
-import 'package:admin_panel/features/shared/offers/presentation/bloc/offers_bloc.dart';
-import 'package:admin_panel/features/shared/offers/services/offer_indicator_service.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/repositories/offers_repository.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/create_offer_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/delete_offer_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/get_offer_by_id_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/get_offers_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/toggle_offer_status_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/usecase/update_offer_usecase.dart';
+import 'package:admin_panel/features/merchandisers/offers/presentation/bloc/offers_bloc.dart';
+import 'package:admin_panel/features/merchandisers/offers/services/offer_indicator_service.dart';
 import 'package:admin_panel/features/shared/orders/data/datasources/orders_remote_datasource.dart';
 import 'package:admin_panel/features/shared/orders/data/repositories/orders_repository_impl.dart';
 import 'package:admin_panel/features/shared/orders/data/services/order_service.dart';
@@ -54,8 +54,8 @@ import 'package:admin_panel/features/shared/orders/domain/repositories/orders_re
 import 'package:admin_panel/features/shared/orders/domain/usecases/orders_usecases.dart';
 
 import 'package:admin_panel/features/shared/orders/presentation/bloc/orders_bloc.dart';
-import 'package:admin_panel/features/shared/profile/data/repositories/profile_repository.dart';
-import 'package:admin_panel/features/shared/profile/presentation/bloc/profile_bloc.dart';
+import 'package:admin_panel/features/merchandisers/profile/data/repositories/profile_repository.dart';
+import 'package:admin_panel/features/merchandisers/profile/presentation/bloc/profile_bloc.dart';
 import 'package:admin_panel/features/shared/shared_feature/data/datasources/category_remote_datasource.dart';
 import 'package:admin_panel/features/shared/shared_feature/data/datasources/customer_remote_datasource.dart';
 import 'package:admin_panel/features/shared/shared_feature/data/datasources/product_remote_datasource.dart';
@@ -195,7 +195,7 @@ Future<void> initializeDependencies() async {
   );
 
   // Merchandisers Management
-  sl.registerLazySingleton<MerchandiserRemoteDataSource>(
+  sl.registerLazySingleton<AdminMerchandiserManagementRemoteDataSource>(
     () => MerchandiserRemoteDataSourceImpl(supabaseClient: sl()),
   );
   sl.registerLazySingleton<MerchandiserRepository>(

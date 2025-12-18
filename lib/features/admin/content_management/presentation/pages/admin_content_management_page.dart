@@ -36,8 +36,8 @@ class AdminContentManagementPage extends StatelessWidget {
               );
               // Reload settings
               context.read<AppSettingsBloc>().add(
-                const LoadAboutSectionSettings(),
-              );
+                    const LoadAboutSectionSettings(),
+                  );
             }
 
             if (state is AppSettingCreated) {
@@ -49,8 +49,8 @@ class AdminContentManagementPage extends StatelessWidget {
               );
               // Reload settings
               context.read<AppSettingsBloc>().add(
-                const LoadAboutSectionSettings(),
-              );
+                    const LoadAboutSectionSettings(),
+                  );
             }
           },
           builder: (context, state) {
@@ -218,9 +218,8 @@ class AdminContentManagementPage extends StatelessWidget {
     String language,
     String content,
   ) {
-    final preview = content.length > 100
-        ? '${content.substring(0, 100)}...'
-        : content;
+    final preview =
+        content.length > 100 ? '${content.substring(0, 100)}...' : content;
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.smallPadding),
@@ -279,8 +278,8 @@ class AdminContentManagementPage extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () {
               context.read<AppSettingsBloc>().add(
-                const LoadAboutSectionSettings(),
-              );
+                    const LoadAboutSectionSettings(),
+                  );
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Retry').tr(),

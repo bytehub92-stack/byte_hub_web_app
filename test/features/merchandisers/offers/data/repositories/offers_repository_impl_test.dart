@@ -1,7 +1,7 @@
 import 'package:admin_panel/core/error/failures.dart';
-import 'package:admin_panel/features/shared/offers/data/models/offer_model.dart';
-import 'package:admin_panel/features/shared/offers/data/repositories/offers_repository_impl.dart';
-import 'package:admin_panel/features/shared/offers/domain/entities/offer.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/models/offer_model.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/repositories/offers_repository_impl.dart';
+import 'package:admin_panel/features/merchandisers/offers/domain/entities/offer.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../datasources/fake_offers_remote_datasource.dart';
 

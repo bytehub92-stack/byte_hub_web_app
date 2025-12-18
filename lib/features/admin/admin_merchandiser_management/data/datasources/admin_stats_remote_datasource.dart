@@ -16,20 +16,23 @@ class AdminStatsRemoteDataSourceImpl implements AdminStatsRemoteDataSource {
   @override
   Future<AdminStatsModel> getAdminStats() async {
     try {
-      // Get merchandisers count
+      // Get total merchandisers count from merchandiser_details_view
       final merchandisersCount = await supabaseClient
-          .from('merchandisers')
+          .from('merchandiser_details_view')
           .select('id')
           .count(CountOption.exact);
 
+      // Get active merchandisers count (now checks profiles.is_active through the view)
       final activeMerchandisersCount = await supabaseClient
-          .from('merchandisers')
+          .from('merchandiser_details_view')
           .select('id')
           .eq('is_active', true)
           .count(CountOption.exact);
+
       print(
-        'admin stats remote datasource, merchandisers count $activeMerchandisersCount',
+        'admin stats remote datasource, active merchandisers count: $activeMerchandisersCount',
       );
+
       // Get customers count
       final customersCount = await supabaseClient
           .from('profiles')
@@ -37,15 +40,15 @@ class AdminStatsRemoteDataSourceImpl implements AdminStatsRemoteDataSource {
           .eq('user_type', 'customer')
           .count(CountOption.exact);
 
-      print('admin stats remote datasource, customers count $customersCount');
+      print('admin stats remote datasource, customers count: $customersCount');
 
-      // Get categories count
+      // Get total categories count (across all merchandisers)
       final categoriesCount = await supabaseClient
           .from('categories')
           .select('id')
           .count(CountOption.exact);
 
-      // Get products count
+      // Get total products count (across all merchandisers)
       final productsCount = await supabaseClient
           .from('products')
           .select('id')

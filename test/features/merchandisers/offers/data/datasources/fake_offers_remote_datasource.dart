@@ -1,5 +1,5 @@
-import 'package:admin_panel/features/shared/offers/data/datasource/offers_remote_datasource.dart';
-import 'package:admin_panel/features/shared/offers/data/models/offer_model.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/datasource/offers_remote_datasource.dart';
+import 'package:admin_panel/features/merchandisers/offers/data/models/offer_model.dart';
 
 class FakeOffersRemoteDataSource implements OffersRemoteDataSource {
   final List<OfferModel> _offers = [];
